@@ -162,8 +162,7 @@
 </span><span class="boring">use ext_php_rs::zend::IniEntryDef;
 </span><span class="boring">use ext_php_rs::flags::IniEntryPermission;
 </span>
-#[php_startup]
-pub fn startup_function(ty: i32, module_number: i32) {
+pub fn startup(ty: i32, mod_num: i32) -&gt; i32 {
     let ini_entries: Vec&lt;IniEntryDef&gt; = vec![
         IniEntryDef::new(
             "my_extension.display_emoji".to_owned(),
@@ -171,21 +170,36 @@ pub fn startup_function(ty: i32, module_number: i32) {
             IniEntryPermission::All,
         ),
     ];
-    IniEntryDef::register(ini_entries, module_number);
+    IniEntryDef::register(ini_entries, mod_num);
+
+    0
+}
+
+#[php_module(startup = "startup")]
+pub fn get_module(module: ModuleBuilder) -&gt; ModuleBuilder {
+    module
 }
 <span class="boring">fn main() {}</span></code></pre></pre>
 <h2 id="getting-ini-settings"><a class="header" href="#getting-ini-settings">Getting INI Settings</a></h2>
 <p>The INI values are stored as part of the <code>GlobalExecutor</code>, and can be accessed via the <code>ini_values()</code> function. To retrieve the value for a registered INI setting</p>
 <pre><pre class="playground"><code class="language-rust no_run"><span class="boring">#![cfg_attr(windows, feature(abi_vectorcall))]
 </span><span class="boring">extern crate ext_php_rs;
-</span><span class="boring">use ext_php_rs::prelude::*;
-</span><span class="boring">use ext_php_rs::zend::ExecutorGlobals;
-</span>
-#[php_startup]
-pub fn startup_function(ty: i32, module_number: i32) {
+</span>use ext_php_rs::{
+    prelude::*,
+    zend::ExecutorGlobals,
+};
+
+pub fn startup(ty: i32, mod_num: i32) -&gt; i32 {
     // Get all INI values
     let ini_values = ExecutorGlobals::get().ini_values(); // HashMap&lt;String, Option&lt;String&gt;&gt;
     let my_ini_value = ini_values.get("my_extension.display_emoji"); // Option&lt;Option&lt;String&gt;&gt;
+
+    0
+}
+
+#[php_module(startup = "startup")]
+pub fn get_module(module: ModuleBuilder) -&gt; ModuleBuilder {
+    module
 }
 <span class="boring">fn main() {}</span></code></pre></pre>
 
@@ -197,6 +211,9 @@ pub fn startup_function(ty: i32, module_number: i32) {
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
+                            <a rel="next prefetch" href="advanced/async_impl.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -208,6 +225,9 @@ pub fn startup_function(ty: i32, module_number: i32) {
                         <i class="fa fa-angle-left"></i>
                     </a>
 
+                    <a rel="next prefetch" href="advanced/async_impl.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
             </nav>
 
         </div>
